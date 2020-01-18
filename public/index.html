@@ -7,46 +7,16 @@
 
     <script defer src="/__/firebase/7.6.1/firebase-app.js"></script>
     <script defer src="/__/firebase/7.6.1/firebase-auth.js"></script>
+    <script defer src="/__/firebase/7.6.1/firebase-firestore.js"></script>
     <!-- <script defer src="/__/firebase/7.6.1/firebase-database.js"></script> -->
     <!-- <script defer src="/__/firebase/7.6.1/firebase-messaging.js"></script> -->
     <!-- <script defer src="/__/firebase/7.6.1/firebase-storage.js"></script> -->
     <script defer src="/__/firebase/init.js"></script>
   </head>
   <body>
-    <script>
-/* global FB:false */
-window.fbAsyncInit = () => {
-  FB.init({
-    appId: '1320344458139321',
-    autoLogAppEvents: true,
-    xfbml: true,
-    version: 'v5.0'
-  })
-  FB.api(
-    '/me/accounts',
-    console.log
-  )
-}
-    </script>
-    <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
-    <h1>eventual</h1>
-    <button id='login-button'>Login</button>
+    <script defer src="/js/LoginButton.js"></script>
 
-    <script defer>
-/* global firebase:false */
-document.getElementById('login-button').addEventListener('click', () => {
-  const facebookProvider = new firebase.auth.FacebookAuthProvider()
-  facebookProvider.addScope('manage_pages')
-  firebase.auth().signInWithPopup(facebookProvider).then(result => {
-    const token = result.credential.accessToken
-    const user = result.user
-    console.log(token)
-    console.log(user)
-    console.log(result.credential)
-  }).catch(error => {
-    console.log(error)
-  })
-})
-    </script>
+    <h1>eventual</h1>
+    <login-button></login-button>
   </body>
 </html>
