@@ -6,6 +6,14 @@ export interface User {
   pageID?: string
 }
 
+export interface ProcessedUser {
+  accessToken: string
+  attemptedToGetAccessTokensAndPageID: boolean
+  longLivedAccessToken: string
+  pageAccessToken: string
+  pageID: string
+}
+
 export interface LongLivedAccessTokenResponseJSON {
   access_token: string
 }

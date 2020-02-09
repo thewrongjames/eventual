@@ -1,35 +1,28 @@
-/* global HTMLElement:false customElements:false firebase:false */
+import LoadableComponent from './LoadableComponent.js'
 
-// eslint-disable-next-line no-unused-vars
-class LoginButton extends HTMLElement {
+class LoginButton extends LoadableComponent {
   constructor () {
     super()
 
-    // Build internal element structure in a shadow DOM.
-    const shadow = this.attachShadow({ mode: 'open' })
-    const container = document.createElement('div')
-    container.setAttribute('class', 'container')
+    this.loadedContent = document.createElement('div')
     this.textSpan = document.createElement('span')
-    this.textSpan.setAttribute('class', 'textSpan')
-    container.appendChild(this.textSpan)
+    this.loadedContent.appendChild(this.textSpan)
     this.loginButton = document.createElement('button')
-    this.loginButton.setAttribute('class', 'loginButton')
-    container.appendChild(this.loginButton)
+    this.loadedContent.appendChild(this.loginButton)
+
     this.setLoading()
 
-    const loginHandler = () => {
+    const loginHandler = async () => {
       this.setLoading()
-      const facebookProvider = new firebase.auth.FacebookAuthProvider()
-      facebookProvider.addScope('manage_pages')
-      return firebase.auth().signInWithPopup(facebookProvider)
-        .then(result => firebase.firestore()
-          .collection('users').doc(result.user.uid).set({
-            uid: result.user.uid,
-            displayName: result.user.displayName,
-            accessToken: result.credential.accessToken
-          })
-        )
-        .catch(console.error)
+      const authProvider = new firebase.auth.FacebookAuthProvider()
+      authProvider.addScope('manage_pages')
+      const loginResult = await firebase.auth().signInWithPopup(authProvider)
+      return firebase.firestore()
+        .collection('users').doc(loginResult.user.uid).set({
+          uid: loginResult.user.uid,
+          displayName: loginResult.user.displayName,
+          accessToken: loginResult.credential.accessToken
+        })
     }
     const logoutHandler = () => {
       this.setLoading()
@@ -48,14 +41,8 @@ class LoginButton extends HTMLElement {
         this.textSpan.innerText = 'Not logged in'
         this.loginButton.innerText = 'Login'
       }
+      this.setLoaded()
     })
-
-    shadow.appendChild(container)
-  }
-
-  setLoading () {
-    this.textSpan.innerText = 'Loading'
-    this.loginButton.innerText = 'Don\'t press'
   }
 }
 
