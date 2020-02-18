@@ -24,3 +24,14 @@ export interface AccountsResponseJSON {
     id: string
   }]
 }
+
+type nonArrayJSONValue = string | number | jsonObject | boolean | null
+interface jsonArray extends Array<jsonArray | nonArrayJSONValue> {}
+type jsonValue = nonArrayJSONValue | jsonArray
+export interface jsonObject {
+  [key: string]: jsonValue
+}
+
+export interface StringKeyedObject {
+  [key: string]: any
+}

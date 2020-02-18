@@ -1,22 +1,34 @@
 import {
-  User, LongLivedAccessTokenResponseJSON, AccountsResponseJSON, ProcessedUser
+  User,
+  LongLivedAccessTokenResponseJSON,
+  AccountsResponseJSON,
+  ProcessedUser,
+  StringKeyedObject
 } from './models'
 
-export function isString (maybeString: any): maybeString is string {
+export const isString = (maybeString: any): maybeString is string => {
   return typeof(maybeString) === 'string'
 }
 
-export function isBoolean (maybeBoolean: any): maybeBoolean is boolean {
+export const isBoolean = (maybeBoolean: any): maybeBoolean is boolean => {
   return typeof(maybeBoolean) === 'boolean'
 }
 
-export function isUser (maybeUser: any): maybeUser is User {
+export const isStringKeyedObject = (
+  maybeStringKeyedObject: any
+): maybeStringKeyedObject is StringKeyedObject => {
+  // All objects are keyed by strings, really. Though null does also have the
+  // type object, so, let's at least make sure it's truthy.
+  return typeof(maybeStringKeyedObject) === 'object' && maybeStringKeyedObject
+}
+
+export const isUser = (maybeUser: any): maybeUser is User => {
   return maybeUser && isString(maybeUser.accessToken)
 }
 
-export function isProcessedUser (
+export const isProcessedUser = (
   maybeProcessedUser: any
-): maybeProcessedUser is ProcessedUser {
+): maybeProcessedUser is ProcessedUser => {
   return isUser(maybeProcessedUser) &&
     isBoolean(maybeProcessedUser.attemptedToGetAccessTokensAndPageID) &&
     isString(maybeProcessedUser.longLivedAccessToken) &&
@@ -24,16 +36,16 @@ export function isProcessedUser (
     isString(maybeProcessedUser.pageID)
 }
 
-export function isLongLivedAccessTokenResponseJSON (
+export const isLongLivedAccessTokenResponseJSON = (
   maybeLongLivedAccessTokenResponseJSON: any
-): maybeLongLivedAccessTokenResponseJSON is LongLivedAccessTokenResponseJSON {
+): maybeLongLivedAccessTokenResponseJSON is LongLivedAccessTokenResponseJSON => {
   return maybeLongLivedAccessTokenResponseJSON &&
     isString(maybeLongLivedAccessTokenResponseJSON.access_token)
 }
 
-export function isAccountsResponseJSON (
+export const isAccountsResponseJSON = (
   maybeAccountsResponseJSON: any
-): maybeAccountsResponseJSON is AccountsResponseJSON {
+): maybeAccountsResponseJSON is AccountsResponseJSON => {
   return maybeAccountsResponseJSON &&
     maybeAccountsResponseJSON.data &&
     maybeAccountsResponseJSON.data[0] &&

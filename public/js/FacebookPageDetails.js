@@ -4,10 +4,7 @@ class FacebookPageDetails extends LoadableComponent {
   constructor () {
     super()
 
-    const loadedContent = document.createElement('div')
-    const description = document.createElement('p')
-    description.innerText = 'The following page is '
-    loadedContent.innerText = 'Hello world!'
+    this.loadedContent = document.createElement('p')
 
     this.setLoading()
 
@@ -18,18 +15,27 @@ class FacebookPageDetails extends LoadableComponent {
     auth.onAuthStateChanged(user => {
       if (!user || !user.uid) {
         if (unsubscribeUserSubscription) unsubscribeUserSubscription()
-        return this.setLoading()
+        this.loadedContent.innerHTML = ''
+        return this.setLoaded()
       }
 
+      this.setLoading()
       unsubscribeUserSubscription = firestore.collection('users').doc(user.uid)
         .onSnapshot(async doc => {
           const { pageAccessToken, pageID } = doc.data()
+          if (!pageAccessToken || !pageID) return this.setLoading()
+
           const url = `https://graph.facebook.com/v6.0/${pageID}?` +
-            'fields=id,name,cover,picture,' +
-            'events{cover,name,description,start_time,end_time,place}&' +
-            `access_token=${pageAccessToken}`
-          const json = await fetch(url).then(response => response.json())
-          console.log(json)
+            `fields=id,name,cover,picture&access_token=${pageAccessToken}`
+          const response = await fetch(url)
+          const json = await response.json()
+
+          const eventListURL = window.location + user.uid
+          this.loadedContent.innerHTML = `
+            The events from your page "${json.name}" are available at
+            <a href="${eventListURL}">${eventListURL}</a>.
+          `
+          this.setLoaded()
         })
     })
   }

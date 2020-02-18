@@ -5,8 +5,8 @@ class LoginButton extends LoadableComponent {
     super()
 
     this.loadedContent = document.createElement('div')
-    this.textSpan = document.createElement('span')
-    this.loadedContent.appendChild(this.textSpan)
+    this.textElement = document.createElement('p')
+    this.loadedContent.appendChild(this.textElement)
     this.loginButton = document.createElement('button')
     this.loadedContent.appendChild(this.loginButton)
 
@@ -33,12 +33,12 @@ class LoginButton extends LoadableComponent {
       if (user) {
         this.loginButton.removeEventListener('click', loginHandler)
         this.loginButton.addEventListener('click', logoutHandler)
-        this.textSpan.innerText = `Logged in as ${user.displayName}`
+        this.textElement.innerText = `Logged in as ${user.displayName}`
         this.loginButton.innerText = 'Logout'
       } else {
         this.loginButton.removeEventListener('click', logoutHandler)
         this.loginButton.addEventListener('click', loginHandler)
-        this.textSpan.innerText = 'Not logged in'
+        this.textElement.innerText = 'Not logged in'
         this.loginButton.innerText = 'Login'
       }
       this.setLoaded()
