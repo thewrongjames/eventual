@@ -20,9 +20,17 @@ class FacebookPageDetails extends LoadableComponent {
       }
 
       this.setLoading()
+
       unsubscribeUserSubscription = firestore.collection('users').doc(user.uid)
         .onSnapshot(async doc => {
-          const { pageAccessToken, pageID } = doc.data()
+          const userData = doc.data()
+          if (!userData) {
+            this.loadedContent.innerHTML =
+              'We have no data on you, please logout and login again.'
+            return this.setLoaded()
+          }
+
+          const { pageAccessToken, pageID } = userData
           if (!pageAccessToken || !pageID) return this.setLoading()
 
           const url = `https://graph.facebook.com/v6.0/${pageID}?` +

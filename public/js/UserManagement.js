@@ -1,6 +1,6 @@
 import LoadableComponent from './LoadableComponent.js'
 
-class LoginButton extends LoadableComponent {
+class UserManagement extends LoadableComponent {
   constructor () {
     super()
 
@@ -35,7 +35,20 @@ class LoginButton extends LoadableComponent {
         this.loginButton.addEventListener('click', logoutHandler)
         this.textElement.innerText = `Logged in as ${user.displayName}`
         this.loginButton.innerText = 'Logout'
+
+        const deleteAllDataButton = document.createElement('button')
+        deleteAllDataButton.innerText = 'Delete All Data'
+        deleteAllDataButton.id = 'delete-all-data-button'
+        deleteAllDataButton.addEventListener('click', () => {
+          firebase.firestore().collection('users').doc(user.uid).delete()
+        })
+        this.loadedContent.appendChild(deleteAllDataButton)
       } else {
+        const maybeDeleteAllDataButton = this.loadedContent.lastChild
+        if (maybeDeleteAllDataButton.id === 'delete-all-data-button') {
+          maybeDeleteAllDataButton.remove()
+        }
+
         this.loginButton.removeEventListener('click', logoutHandler)
         this.loginButton.addEventListener('click', loginHandler)
         this.textElement.innerText = 'Not logged in'
@@ -46,4 +59,4 @@ class LoginButton extends LoadableComponent {
   }
 }
 
-customElements.define('login-button', LoginButton)
+customElements.define('user-management', UserManagement)
