@@ -6,7 +6,9 @@ import {
   isUser, isLongLivedAccessTokenResponseJSON, isAccountsResponseJSON
 } from './typeGuards'
 
-export default async function (change: functions.Change<FirebaseFirestore.DocumentSnapshot>) {
+export default async function (
+  change: functions.Change<FirebaseFirestore.DocumentSnapshot>
+) {
   try {
     const oldUser = change.before.data()
     const user = change.after.data()
@@ -50,7 +52,8 @@ export default async function (change: functions.Change<FirebaseFirestore.Docume
     await change.after.ref.set(newUser, { merge: true })
   } catch (error) {
     // Continuing to loop infinitely would be rather bad. We wan't to make
-    // sure that certainly doesn't happen.
+    // sure that certainly doesn't happen, even though this would trigger an
+    // additional invocation of this function.
     await change.after.ref
       .set({ attemptedToGetAccessTokensAndPageID: true}, { merge: true })
     throw error
