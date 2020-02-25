@@ -15,7 +15,7 @@ class UserManagement extends LoadableComponent {
     const loginHandler = async () => {
       this.setLoading()
       const authProvider = new firebase.auth.FacebookAuthProvider()
-      authProvider.addScope('manage_pages')
+      authProvider.addScope('pages_show_list')
       const loginResult = await firebase.auth().signInWithPopup(authProvider)
       return firebase.firestore()
         .collection('users').doc(loginResult.user.uid).set({
