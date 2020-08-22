@@ -39,12 +39,12 @@ export const handleAPIErrors =
           })
         }
 
-        console.error('API call failed with unexpected error:')
+        console.error('API call failed with an unexpected error:')
         console.error(error)
         return res.status(500).send({ error: {
           status: 500,
-          message: 'An error we might not want to tell you about occured. If ' +
-            'you are us, check the logs. Otherwise, sorry about this.'
+          message: 'An error we might not want to tell you about occurred. ' +
+            'If you are us, check the logs. Otherwise, sorry about this.'
         }})
       }
     }
