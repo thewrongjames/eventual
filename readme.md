@@ -16,10 +16,18 @@ and the routes that users can go to for JSON once they have logged in.
 These will require the `firebase-tools` package from npm to be installed
 globally.
 
-Serving locally:
+Emulating locally:
 
 ```bash
-firebase serve
+firebase emulators:start
+```
+
+Before running the emulators you may want to run the following command in the
+functions directory in order to copy down the configuration that is expected to
+hold the facebook app credentials (file should be gitignored).
+
+```bash
+firebase functions:config:get > .runtimeconfig.json
 ```
 
 Deploying:
@@ -28,7 +36,7 @@ Deploying:
 firebase deploy
 ```
 
-In both cases `--only hosting` or `--only functions` should be able to be used
-to filter down to only a particular part, but things might get complicated
-because the hosting remaps the http functions to turn up at a certain point, so,
-who knows.
+In both cases `--only hosting`, `--only functions`, or `--only firestore` should
+be able to be used to filter down to only a particular part, but things might
+get complicated because the hosting remaps the http functions to turn up at a
+certain point, so, who knows.

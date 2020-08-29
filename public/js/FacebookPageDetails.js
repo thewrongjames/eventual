@@ -38,7 +38,7 @@ class FacebookPageDetails extends LoadableComponent {
           const response = await fetch(url)
           const json = await response.json()
 
-          const eventListURL = window.location + user.uid
+          const eventListURL = window.location + 'v1.0/' + user.uid
           this.loadedContent.innerHTML = `
             The events from your page "${json.name}" are available at
             <a href="${eventListURL}">${eventListURL}</a>.

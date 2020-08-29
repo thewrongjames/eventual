@@ -26,7 +26,7 @@ export interface AccountsResponseJSON {
 }
 
 type NonArrayJSONValue = string | number | JSONObject | boolean | null
-interface JSONArray extends Array<JSONArray | NonArrayJSONValue> {}
+export interface JSONArray extends Array<JSONArray | NonArrayJSONValue> {}
 type JSONValue = NonArrayJSONValue | JSONArray
 export interface JSONObject {
   [key: string]: JSONValue

@@ -6,3 +6,6 @@
 typings/
 
 node_modules/
+
+# Local copy of functions configuration variables
+.runtimeconfig.json

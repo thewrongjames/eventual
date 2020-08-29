@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 
 import { isProcessedUser, isStringKeyedObject, isString } from './typeGuards'
 import { handleAPIErrors, ClientError, ServerError } from './apiErrorHandling'
-import { JSONObject } from './models'
+import { JSONObject, JSONArray } from './models'
 
 const eventAPIHandlerApp = express()
 eventAPIHandlerApp.use(cors({ origin: true }))
@@ -47,45 +47,49 @@ const getGraphAPIData = async (
   return json
 }
 
-const getDepaginatedGraphAPIData = async (
-  path: string, accessToken: string, fields: string, numberToGet: number
-) => {
-  let data: JSONObject[] = []
-  let before: string | null = null
-  do {
-    const limit = numberToGet - data.length
-    const otherParamaters: string =
-      `limit=${limit}` + (before ? `&before=${before}` : '')
-    const json =
-      await getGraphAPIData(path, accessToken, fields, otherParamaters)
-    if (!json.data) {
-      console.error('Graph API gave the following JSON with no data attribute:')
-      console.error(json)
-      throw new ServerError(500, 'Got bad data from graph API.')
-    }
-    data = data.concat(Object.values(json.data))
+const getPageOfGraphAPIData = async (
+  path: string, accessToken: string, fields: string, after?: string
+): Promise<{data: JSONArray, after?: string}> => {
+  // Encode URI component to prevent user input from being injected into the
+  // query to the Graph API, which is rather important.
+  const otherParameters = after ? `after=${encodeURIComponent(after)}` : ''
+  const json = await getGraphAPIData(path, accessToken, fields, otherParameters)
+  if (!Array.isArray(json.data)) {
+    console.error('Graph API gave the following JSON with non-array data:')
+    console.error(json)
+    throw new ServerError(500, 'Got bad data from graph API.')
+  }
+  if (
+    !isStringKeyedObject(json.paging)
+    || Array.isArray(json.paging)
+    || !isStringKeyedObject(json.paging.cursors)
+    || Array.isArray(json.paging.cursors)
+  ) {
+    console.error('Could not extract cursors from following Graph API JSON:')
+    console.error(json)
+    throw new ServerError(500, 'Got bad cursors from graph API.')
+  }
 
-    if (
-      !isStringKeyedObject(json.paging) ||
-      Array.isArray(json.paging) ||
-      !isString(json.paging.next) ||
-      !isStringKeyedObject(json.paging.cursors) ||
-      Array.isArray(json.paging.cursors) ||
-      !isString(json.paging.cursors.after)
-    ) break
-    before = json.paging.cursors.after
-  } while (data.length < numberToGet)
-
-  return data
+  return {
+    data: json.data,
+    after: typeof json.paging.cursors.after === 'string'
+      ? json.paging.cursors.after
+      : undefined
+  }
 }
 
 const eventsHandler: express.RequestHandler = async (req, res) => {
   const uid = req.params.uid
+  const after = req.query.after
+
+  if (after !== undefined && !isString(after)) {
+    throw new ClientError(404, 'Expected after cursor to be a string.')
+  }
 
   const user = await getProcessedUser(uid)
 
-  const json = await getDepaginatedGraphAPIData(
-    `${user.pageID}/events`, user.pageAccessToken, eventFields, 50
+  const json = await getPageOfGraphAPIData(
+    `${user.pageID}/events`, user.pageAccessToken, eventFields, after
   )
   res.send(json)
 }
@@ -118,7 +122,7 @@ const eventHandler: express.RequestHandler = async (req, res) => {
   res.send(eventJSON)
 }
 
-eventAPIHandlerApp.get('/:uid', handleAPIErrors(eventsHandler))
-eventAPIHandlerApp.get('/:uid/:eventID', handleAPIErrors(eventHandler))
+eventAPIHandlerApp.get('/v1.0/:uid', handleAPIErrors(eventsHandler))
+eventAPIHandlerApp.get('/v1.0/:uid/:eventID', handleAPIErrors(eventHandler))
 
 export default eventAPIHandlerApp
