@@ -1,3 +1,5 @@
+import { Request, Response } from 'express'
+
 export interface User {
   accessToken: string
   attemptedToGetAccessTokensAndPageID?: boolean
@@ -35,3 +37,5 @@ export interface JSONObject {
 export interface StringKeyedObject {
   [key: string]: any
 }
+
+export type AsyncRequestHandler = (req: Request, res: Response) => Promise<void>

@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import { AsyncRequestHandler } from './models'
 
 class ErrorWithStatusCode extends Error {
   public statusCode: number
@@ -28,20 +28,22 @@ export class ServerError extends ErrorWithStatusCode {
 }
 
 export const handleAPIErrors =
-  (requestHandler: RequestHandler): RequestHandler =>
-    async (req, res, next) => {
+  (requestHandler: AsyncRequestHandler): AsyncRequestHandler =>
+    async (req, res) => {
       try {
-        return await requestHandler(req, res, next)
+        await requestHandler(req, res)
+        return
       } catch (error) {
         if (error instanceof ErrorWithStatusCode) {
-          return res.status(error.statusCode).send({
+          res.status(error.statusCode).send({
             error: { status: error.statusCode, message: error.message }
           })
+          return
         }
 
         console.error('API call failed with an unexpected error:')
         console.error(error)
-        return res.status(500).send({ error: {
+        res.status(500).send({ error: {
           status: 500,
           message: 'An error we might not want to tell you about occurred. ' +
             'If you are us, check the logs. Otherwise, sorry about this.'

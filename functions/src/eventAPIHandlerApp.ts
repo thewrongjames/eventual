@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 
 import { isProcessedUser, isStringKeyedObject, isString } from './typeGuards'
 import { handleAPIErrors, ClientError, ServerError } from './apiErrorHandling'
-import { JSONObject, JSONArray } from './models'
+import { JSONObject, JSONArray, AsyncRequestHandler } from './models'
 
 const eventAPIHandlerApp = express()
 eventAPIHandlerApp.use(cors({ origin: true }))
@@ -78,7 +78,7 @@ const getPageOfGraphAPIData = async (
   }
 }
 
-const eventsHandler: express.RequestHandler = async (req, res) => {
+const eventsHandler: AsyncRequestHandler = async (req, res) => {
   const uid = req.params.uid
   const after = req.query.after
 
@@ -94,7 +94,7 @@ const eventsHandler: express.RequestHandler = async (req, res) => {
   res.send(json)
 }
 
-const eventHandler: express.RequestHandler = async (req, res) => {
+const eventHandler: AsyncRequestHandler = async (req, res) => {
   const [uid, eventID] = [req.params.uid, req.params.eventID]
 
   const user = await getProcessedUser(uid)
